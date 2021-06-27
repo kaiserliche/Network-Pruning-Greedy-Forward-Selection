@@ -13,7 +13,7 @@ import math
 
 from lib.utils import accuracy, AverageMeter
 from lib.data import get_dataset_ft
-from lib.net_measure import measure_model
+# from lib.net_measure import measure_model
 
 from models.mobilenet_v2 import MobileNetV2_prescreen, eps, Mask, mb2_prune_ratio
 
