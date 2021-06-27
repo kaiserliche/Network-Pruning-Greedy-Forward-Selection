@@ -1,6 +1,3 @@
-# Code for "AMC: AutoML for Model Compression and Acceleration on Mobile Devices"
-# Yihui He*, Ji Lin*, Zhijian Liu, Hanrui Wang, Li-Jia Li, Song Han
-# {jilin, songhan}@mit.edu
 
 import torch
 import torch.nn.parallel
@@ -123,6 +120,21 @@ def get_dataset(dset_name, batch_size, n_worker, data_root, skip = 1):
             datasets.ImageFolder(traindir, transforms.Compose(imagenet_tran_train)),
             batch_size=batch_size, shuffle=True,
             num_workers=n_worker, pin_memory=True, sampler=None)
+            
+        full_size = len(datasets.ImageFolder(traindir, transforms.Compose(imagenet_tran_train)))
+        indices = list(range(full_size))
+        split_indices = list(np.arange(0, full_size, skip))
+        split_indices = []
+        for _ in indices:
+            if _ % skip == 0:
+                split_indices.append(_)
+        from torch.utils.data import SubsetRandomSampler
+        valid_sampler = SubsetRandomSampler(split_indices)
+
+        eval_train_loader = torch.utils.data.DataLoader(
+            datasets.ImageFolder(traindir, transforms.Compose(imagenet_tran_train)),
+            batch_size=batch_size, shuffle=False,
+            num_workers=n_worker, pin_memory=True, sampler=valid_sampler)
 
         val_loader = torch.utils.data.DataLoader(
             datasets.ImageFolder(valdir, transforms.Compose(imagenet_tran_test)),
